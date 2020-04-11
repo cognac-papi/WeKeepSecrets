@@ -1,0 +1,112 @@
+package docs;
+
+public class ClassifiedDocument extends DocumentClass {
+
+	private static final int DEFAULT_SIZE = 50;
+	private static final int RESIZE = 2;
+	private static final String WRITE = " write";
+	private static final String READ = " read";
+
+	private String[] accesses;
+	private String[] grants;
+	private String[] revokes;
+	private int counterAccesses;
+	private int counterGrants;
+	private int counterRevokes;
+
+	public ClassifiedDocument(String name, String managerId, String securityLevel, String information) {
+		super(name, managerId, securityLevel, information);
+
+		accesses = new String[DEFAULT_SIZE];
+		grants = new String[DEFAULT_SIZE];
+		revokes = new String[DEFAULT_SIZE];
+	}
+
+	public String[] getLastAccesses() {
+		return accesses;
+	}
+
+	public String[] getGrants() {
+		return grants;
+	}
+
+	public String[] getRevokes() {
+		return revokes;
+	}
+
+	public int getCounterAccesses() {
+		return counterAccesses;
+	}
+
+	public int getCounterGrants() {
+		return counterGrants;
+	}
+
+	public int getCounterRevokes() {
+		return counterRevokes;
+	}
+
+	public String read(String userId) {
+		if (isFull(accesses, counterAccesses)) {
+			resize(accesses);
+			accesses[counterAccesses++] = userId + READ;
+			numberAccesses++;
+		} else {
+			accesses[counterAccesses++] = userId + READ;
+			numberAccesses++;
+		}
+		return description;
+	}
+
+	public void write(String userId, String newInformation) {
+		if (isFull(accesses, counterAccesses)) {
+			resize(accesses);
+			accesses[counterAccesses++] = userId + WRITE;
+			numberAccesses++;
+		} else {
+			accesses[counterAccesses++] = userId + WRITE;
+			numberAccesses++;
+		}
+		description = newInformation;
+	}
+
+	public void grantAccess(String userId) {
+		if (isFull(grants, counterGrants)) {
+			resize(grants);
+			grants[counterGrants++] = userId;
+		} else
+			grants[counterGrants++] = userId;
+	}
+
+	// Pre: hasGrantedAccess(userId) == true
+	public void revokeAccess(String userId) {
+		if (isFull(revokes, counterRevokes)) {
+			resize(revokes);
+			revokes[counterRevokes++] = userId;
+		} else
+			revokes[counterRevokes++] = userId;
+	}
+
+	public boolean hasGrantedAccess(String userId) {
+		int i = 0;
+		boolean found = false;
+		while ((i < counterGrants) && (!found)) {
+			if (grants[i].equalsIgnoreCase(userId))
+				found = true;
+			else
+				i++;
+		}
+		return found;
+	}
+
+	private boolean isFull(String[] vect, int counter) {
+		return vect.length == counter;
+	}
+
+	private void resize(String[] vect) {
+		String[] tmp = new String[RESIZE * vect.length];
+		for (int i = 0; i < vect.length - 1; i++)
+			tmp[i] = vect[i];
+		vect = tmp;
+	}
+}
