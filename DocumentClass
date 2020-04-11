@@ -1,0 +1,62 @@
+package docs;
+
+public class DocumentClass implements Document {
+
+    private String managerId;
+    private String name, securityLevel;
+    protected String description; 
+    protected int numberAccesses;
+
+    public DocumentClass(String name, String managerId, String securityLevel, String description) {
+        this.name = name;
+        this.managerId = managerId;
+        this.securityLevel = securityLevel;
+        this.description = description;
+    }
+
+    @Override
+    public String getDocument() {
+        return description;
+    }
+
+    @Override
+    public String getManager() {
+        return managerId;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public int getNumberAccesses() {
+        return numberAccesses;
+    }
+
+    @Override
+    public String getSecurityLevel() {
+        return securityLevel;
+    }
+
+	@Override
+	public void write(String userId, String newDescription) {
+		
+	}
+
+	@Override
+	public String read(String userId) {
+		
+		return description;
+	}
+
+	@Override
+	public void grantAccess(String userId) {
+
+	}
+
+	@Override
+	public void revokeAccess(String userId) {
+		
+	}
+}
