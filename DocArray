@@ -1,0 +1,83 @@
+package docs;
+
+public class DocArray {
+	
+	private static final int RESIZE = 2;
+	private static final int DEFAULT = 100;
+	
+	private Document[] docs;
+	private int counter;
+	
+	public DocArray() {
+		docs = new Document[DEFAULT];
+		counter = 0;
+	}
+	
+	public boolean hasDoc(String docName) {
+		return searchIndex(docName) > -1;
+	}
+	
+	public void addDoc(String docName, String managerId, String securityLevel, String description) {
+		
+		if(isFull()) {
+			resize();
+		}
+		
+		if(securityLevel == "official") {
+			docs[counter++] = new OfficialDocument(docName, managerId, securityLevel, description);
+		} else
+			docs[counter++] = new ClassifiedDocument(docName, managerId, securityLevel, description);
+	}
+
+	public void updateDescription(String docName, String userId, String newDescription) {
+		
+		docs[searchIndex(docName)].write(userId, newDescription);
+		
+	}
+	
+	public String readDoc(String docName, String userId) {
+		
+		return docs[searchIndex(docName)].read(userId);
+	}
+	
+	public void grantAccess(String docName, String userId) {
+		
+		docs[searchIndex(docName)].grantAccess(userId);
+		
+	}
+	
+	public void revokeAccess(String docName, String userId) {
+		
+		docs[searchIndex(docName)].revokeAccess(userId);
+		
+	}
+	
+	private boolean isFull() {
+		return docs.length == counter;
+	}
+	
+	private void resize() {
+		Document[] tmp = new Document[RESIZE * docs.length];
+		for (int i = 0; i < docs.length - 1; i++)
+			tmp[i] = docs[i];
+		docs = tmp;
+	}
+	
+	private int searchIndex(String docName) {
+
+		int i = 0;
+		int result = -1;
+		boolean found = false;
+		while ((i < counter) && (!found)) {
+			if (docs[i].getName().equalsIgnoreCase(docName))
+				found = true;
+			else
+				i++;
+		}
+		if (found) {
+			result = i;
+		}
+		return result;
+	}
+}
+
