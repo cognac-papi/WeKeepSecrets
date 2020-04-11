@@ -1,0 +1,37 @@
+package docs;
+
+public class OfficialDocument extends DocumentClass {
+
+    private static final int DEFAULT_SIZE = 10;
+
+    private String[] lastAccesses;
+    private int counter;
+
+    public OfficialDocument(String name, String managerId, String securityLevel, String information) {
+        super(name, managerId, securityLevel, information);
+
+        lastAccesses = new String[DEFAULT_SIZE];
+    }
+
+    public String[] getLastAccesses() {
+        return lastAccesses;
+    }
+
+    public String read(String userId) {
+        if (isFull()) {
+            for(int i = 0; i < counter; i++) {
+                lastAccesses[i] = lastAccesses[i + 1];
+            }
+            lastAccesses[counter] = userId;
+            numberAccesses++;
+        } else  {
+            lastAccesses[counter++] = userId;
+        	numberAccesses++; 
+        }
+        return description;
+    }
+
+    private boolean isFull() {
+        return lastAccesses.length == counter;
+    }
+}
