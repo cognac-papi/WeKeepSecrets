@@ -1,0 +1,286 @@
+import java.util.Scanner;
+
+import organisation.Organisation;
+import organisation.OrganisationClass;
+import users.UserClass;
+
+public class Main {
+	/**
+	 * User Commands
+	 */
+	private static final String REGISTER = "REGISTER";
+	private static final String LISTUSERS = "LISTUSERS";
+	private static final String UPLOAD = "UPLOAD";
+	private static final String WRITE = "WRITE";
+	private static final String READ = "READ";
+	private static final String GRANT = "GRANT";
+	private static final String REVOKE = "REVOKE";
+	private static final String USERDOCS ="USERDOCS";
+	private static final String TOPLEAKED = "TOPLEAKED";
+	private static final String TOPGRANTERS = "TOPGRANTERS";
+	private static final String HELP = "HELP";
+	private static final String EXIT = "EXIT";
+
+	/**
+	 * Program output feedback
+	 */	
+	private static final String USER = "User ";
+	private static final String REGISTERED = " was registered.";
+	private static final String IDENTIFIER = "Identifier ";
+	private static final String ALREADY_ASSIGNED = " is already assigned to another user.";
+	private static final String REGISTERED_USERS = "registered users.";
+	private static final String DOCUMENT = "Document ";
+	private static final String UPLOADED = " was uploaded.";
+	private static final String NOT_REGISTERED_USER = "Not a registered user.";
+	private static final String ALREADY_EXISTS = " already exists in the user account.";
+	private static final String DOES_NOT_EXIST = " does not exist in the user account.";
+	private static final String INSUFFICIENT = "Insufficient security clearance.";
+	private static final String UPDATED = "was updated.";
+	private static final String CANNOT_UPDATED = " cannot be updated.";
+	private static final String DOCUMENT_DESCRIPTION = "Document: ";
+	private static final String ACCESS = "Access to document ";
+	private static final String GRANTED = " has been granted.";
+	private static final String GRANTS_ISSUED = "Grants can only be issued between officers.";
+	private static final String HAS_ACCESS = "Already has access to document ";
+	private static final String FULL_STOP = ".";
+	private static final String BEEN_REVOKED = " has been revoked.";
+	private static final String NOT_EXIST = " does not exist.";
+	private static final String GRANT_OFFICER = "Grant for officer ";
+	private static final String ALREADY_REVOKED = "was already revoked.";
+	private static final String ACCESSES = "accesses.";
+	private static final String GRANTS = "grants.";
+	private static final String THERE_NO = "There are no ";
+	private static final String DOCUMENTS_END = " documents.";
+	private static final String INAPPROPRIATE_LEVEL = "Inappropriate security level.";
+	private static final String LEAKED_DOCUMENTS = "leaked documents.";
+	private static final String OFFICER_GRANTS = "No officer has given grants.";
+	private static final String HELP_MENU = 
+			"register - registers a new user\n" + 
+			"listusers - list all registered users\n" +
+			"upload - upload a document\n" +
+			"read - read a document\n" +
+			"write - write a document\n" + 
+			"grant - grant access to a document\n" +
+			"revoke - revoke a grant to access a document\n" +
+			"userdocs - list the official or classified documents of a user\n" +
+			"topleaked - list the top 10 documents with more grants\n" +
+			"topgranters - list the top 10 officers that have given more grants\n" +
+			"help - shows the available commands\n" +
+			"exit - terminates the execution of the program\n";
+	private static final String BYE = "Bye!\n";
+
+	/**
+	 * 
+	 * @param args - 
+	 */
+	public static void main(String[] args) {
+		Main.commands();
+	}
+
+	/**
+	 * Interpretador de comandos.
+	 */
+	private static void commands() {
+		/*************************************************************/
+		/*** Criacao do objecto                                    ***/
+		/*** Assume-se que existe a Interface ShapesCollection     ***/
+		/*** que 'e implementada pela classe ShapesCollectionClass ***/
+		/*************************************************************/
+		OrganisationClass org = new OrganisationClass();
+
+		Scanner in = new Scanner(System.in);
+		String command = in.next().toUpperCase();
+
+		while (!command.equals(Main.EXIT)) {
+			switch (command) {
+			case Main.REGISTER:
+				register(in,org);
+				break;
+			case Main.LISTUSERS:
+				listUsers(in,org);
+				break;
+			case Main.UPLOAD:
+				upload(org);
+				break;
+			case Main.WRITE:
+				write(in,org);
+				break;
+			case Main.READ:
+				read(org);
+				break;
+			case Main.GRANT:
+				grant(in, org);
+				break;
+			case Main.REVOKE:
+				revoke(org);
+				break;
+			case Main.USERDOCS:
+				userDocs(org);
+				break;
+			case Main.TOPLEAKED:
+				topLeaked(org);
+				break;
+			case Main.TOPGRANTERS:
+				topGranters(org);
+				break;
+			case Main.HELP:
+				help(org);
+				break;
+			default:
+				break;
+			}
+			command = in.next().toUpperCase();
+		}
+		System.out.println(BYE);
+	}
+
+	/**
+	 * Adiciona um circulo 'a coleccao de formas geometricas, 
+	 * caso o identificador dado nao exista. Se ja existir, nao faz nada.
+	 * @param in - o input de onde os dados vao ser lidos.
+	 * @param shapes - o ShapesCollection no qual se pretende adicionar o circulo.
+	 */
+	private static void register(Scanner in, OrganisationClass org) {
+		String kind = in.next().trim();
+		String id = in.next().trim();
+		String clearLevel = in.next().trim();
+		
+		if (org.hasUser(id))
+			System.out.println(Main.IDENTIFIER + id + Main.ALREADY_ASSIGNED);
+		else {
+			org.register(kind, id, clearLevel);
+			System.out.println(Main.USER + id + Main.REGISTERED);
+		}
+	}
+
+	private static void listUsers(OrganisationClass org) {
+		Iterator it = org.listUsers();
+
+        if(org.empty()) {
+            System.out.println(THERE_NO + REGISTERED_USERS);
+        } else {
+            while(it.hasNext()) {
+                User u = it.next();
+                System.out.println(u.getKind() + " " + u.getId() + " " + u.getSecurityLevel());
+            } 
+        }
+	}
+
+	private static void upload(Scanner in, OrganisationClass org) {
+		String docName = in.next().trim();
+		String id = in.next().trim();
+		String securityLevel = in.next().trim();
+		String description = in.nextLine().trim();
+
+		if(!org.hasUser(id)) 
+			System.out.println(Main.NOT_REGISTERED_USER);
+		else if(!org.hasDoc(docName)) 
+			System.out.println(Main.DOCUMENT + docName + Main.ALREADY_EXISTS);
+		else if(org.hasLowerSec(id, docName))
+			System.out.println(Main.INSUFFICIENT);
+		else {
+			org.upload(docName, id, securityLevel, description);
+			System.out.println(Main.DOCUMENT + docName + Main.UPLOADED);
+		}
+		
+	}
+
+	private static void write(Scanner in, OrganisationClass org) {
+		String docName = in.next().trim();
+        String managerId = in.next().trim();
+        String userId = in.nextLine().trim();
+        String newInfo = in.nextLine().trim();
+
+        if(!org.hasUser(managerId) || !org.hasUser(userId)) 
+            System.out.println(NOT_REGISTERED_USER);
+        else if(!org.hasDoc(docName)) 
+            System.out.println(DOCUMENT + docName + DOES_NOT_EXIST);
+        else if(org.officialDoc(docName)) 
+            System.out.println(DOCUMENT + docName + CANNOT_UPDATED);
+        else if(!org.canAccess(docName, userId)) 
+            System.out.println(INSUFFICIENT);
+        else {
+            org.write(docName, userId, newInfo);
+            System.out.println(DOCUMENT + docName + UPDATED);
+        }
+	}
+
+	private static void read(Scanner in, OrganisationClass org) {
+		String docName = in.next().trim();
+		String idManager = in.next().trim();
+		String idReader = in.next().trim();
+		
+		if(!org.hasUser(idManager))
+			System.out.println(Main.NOT_REGISTERED_USER);
+		else if(!org.hasDoc(docName))
+			System.out.println(Main.DOCUMENT + docName + Main.ALREADY_EXISTS);
+		else if(org.hasLowerSec(idReader, docName) || !org.hasGrant(idReader))
+			System.out.println(Main.INSUFFICIENT);
+		else System.out.println(Main.DOCUMENT_DESCRIPTION + org.read(docName, idManager, idReader));
+	}
+	
+	private static void grant(Scanner in, OrganisationClass org) {
+		String docName = in.next().trim();
+        String managerId = in.next().trim();
+        String userId = in.nextLine().trim();
+
+        if(!org.hasUser(managerId) ||  !org.hasUser(userId))
+            System.out.println(NOT_REGISTERED_USER);
+        else if(org.isClerk(managerId) || org.isClerk(userId))
+            System.out.println(GRANTS_ISSUED);
+        else if(!org.hasDoc(docName))
+            System.out.println(DOCUMENT + docName + DOES_NOT_EXIST);
+        else if(org.canAccess(docName, userId)) 
+            System.out.println(HAS_ACCESS + docName + FULL_STOP);
+        else {
+            org.grant(docName, managerId, userId);
+            System.out.println(ACCESS + docName + GRANTED);
+        }
+	}
+
+	private static void revoke(Scanner in, OrganisationClass org) {
+			String docName = in.next().trim();
+			String idManager = in.next().trim();
+			String idGranted = in.next().trim();
+			
+			if(!org.hasUser(idManager))
+				System.out.println(Main.NOT_REGISTERED_USER);
+			else if(org.isClerk(idManager) || org.isClerk(idGranted)) 
+				System.out.println(Main.GRANTS_ISSUED);
+			else if(!org.hasDoc(idManager))
+				System.out.println(Main.DOCUMENT + docName + Main.DOES_NOT_EXIST);
+			else if(org.hasClearance(idGranted))
+				System.out.println(Main.HAS_ACCESS + docName);
+			else {
+				org.revoke(docName, idManager, idGranted);
+				System.out.println(Main.ACCESS + docName + Main.BEEN_REVOKED);
+			}
+	}
+	
+	private static void userDocs(OrganisationClassClass org) {
+
+	}
+
+	private static void topLeaked(OrganisationClass org) {
+		Iterator it = org.listUsers();
+
+        if(org.docEmpty()) {
+            System.out.println(THERE_NO + REGISTERED_USERS);
+        } else {
+            while(it.hasNext()) {
+                DocumentClass d = it.next();
+                System.out.println(d.getName() + " " + d.getUserId() + " " + d.getUseSecurityLevel() + " " +
+                d.getNumAccesses() + " " + d.getNumGrantsGiven() + " " + d.getNumGrantsRevoked);
+            } 
+        }
+	}
+
+	private static void topGranters(OrganisationClass org) {
+
+	}
+
+	private static void help(OrganisationClass org) {
+			System.out.println(HELP_MENU);
+	}
+
+}
