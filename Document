@@ -1,0 +1,21 @@
+package docs;
+
+public interface Document {
+	String getDocument();
+
+    String getManager();
+
+    String getName();
+
+    String getSecurityLevel();
+
+    int getNumberAccesses();
+    
+    void write(String userId, String newDescription);
+    
+    String read(String userId);
+    
+    void grantAccess(String userId);
+    
+    void revokeAccess(String userId);
+}
